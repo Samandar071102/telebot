@@ -1,4 +1,3 @@
-import asyncio
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, CallbackQueryHandler, ConversationHandler, filters
 from config import BOT_TOKEN
 from db import init_db
@@ -6,11 +5,10 @@ from parent_handlers import *
 from admin_handlers import *
 from states import *
 
-# DB init
 init_db()
 
-async def main():
-    app = ApplicationBuilder().token(BOT_TOKEN).concurrent_updates(True).build()
+def main():
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
 
     # ota-ona
     app.add_handler(ConversationHandler(
@@ -28,14 +26,8 @@ async def main():
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, admin_password_check))
 
     app.add_handler(CommandHandler("start_lesson", start_lesson))
-    app.add_handler(CallbackQueryHandler(choose_lesson_number, pattern="^grp_"))
-    app.add_handler(CallbackQueryHandler(open_attendance_panel, pattern="^lesson_"))
-    app.add_handler(CallbackQueryHandler(mark_attendance, pattern="^att_"))
 
-    # Start bot
-    await app.start()
-    await app.updater.start_polling()
-    await app.idle()
+    app.run_polling()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
